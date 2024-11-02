@@ -131,7 +131,7 @@ jobs:
             git pull origin main
 
             # docker-compose.yaml이나 DAG 파일 변경이 감지되면 Airflow 재시작
-            if git diff --name-only HEAD~1 | grep -E 'docker-compose.yaml|dags/'; then
+            if git diff --name-only HEAD~1 | grep -E 'compose.yaml|dags/'; then
               echo "⭐️ Airflow 재시작"
               astro dev stop
               astro dev start
