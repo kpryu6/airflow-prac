@@ -87,18 +87,15 @@ jobs:
               astro dev stop && astro dev kill
 
               echo "⭐️ airflow plugins 폴더 권한 변경 완료"
-              sudo chown ubuntu plugins
-              sudo chgrp ubuntu plugins
+              sudo chown ${{ secrets.SSH_USERNAME }} plugins
+              sudo chgrp ${{ secrets.SSH_USERNAME }} plugins
 
               echo "⭐️ conda 환경 변수 적용 완료"
               conda init
               source ~/.bashrc
 
-              echo "⭐️ Airflow 설치"
-              pip install apache-airflow
-
-              echo "⭐️ 코드 테스트"
-              pip install pytest
+              echo "⭐️ Airflow 설치 및 코드 테스트"
+              pip install apache-airflow pytest
               pytest
 
               echo "⭐️ 설정 완료"
@@ -120,9 +117,9 @@ jobs:
           REPOSITORY_NAME: ${{ github.event.repository.name }}
         uses: appleboy/ssh-action@master
         with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }} # 운영 환경의 GCP INSTANCE
-          host: ${{ secrets.SSH_HOST }} # 마찬가지
-          username: ${{ secrets.SSH_USERNAME }} # 마찬가지
+          key: ${{ secrets.SSH_PRIVATE_KEY }} # 운영 환경의 GCP INSTANCE에 할당한 공개키에 대응되는 비밀키
+          host: ${{ secrets.SSH_HOST }} 
+          username: ${{ secrets.SSH_USERNAME }} 
           script: |
             cd
             CURRENT_DIR=$(pwd)
@@ -130,10 +127,14 @@ jobs:
             echo "현재 위치: $(pwd)"
             git pull origin main
 
+            echo "⭐️ PostgreSQL에서 사용자와 데이터베이스 생성"
+            sudo -u postgres psql -c "DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'ryu') THEN CREATE ROLE ryu WITH LOGIN CREATEDB; END IF; END $$;"
+            sudo -u postgres psql -c "SELECT 'CREATE DATABASE ryu' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'ryu')\gexec"
+
             # docker-compose.yaml이나 DAG 파일 변경이 감지되면 Airflow 재시작
             if git diff --name-only HEAD~1 | grep -E 'compose.yaml|dags/'; then
               echo "⭐️ Airflow 재시작"
               astro dev stop
-              astro dev start
+              astro dev start -d
             fi
             echo "⭐️ 배포 완료"            
