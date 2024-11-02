@@ -71,7 +71,7 @@ jobs:
 
               echo "⭐️ Astronomer 설치 및 Airflow 시작"
               curl -sSL install.astronomer.io | sudo bash -s -- v1.25.0 
-              git clone git@github.com:TEDD325/airflow-practice.git
+              git clone git@github.com:kpryu6/airflow-prac.git
               cd airflow-practice
               touch .env
               astro dev start 2>astro_error.log &
@@ -93,6 +93,13 @@ jobs:
               echo "⭐️ conda 환경 변수 적용 완료"
               conda init
               source ~/.bashrc
+
+              echo "⭐️ Airflow 설치"
+              pip install apache-airflow
+
+              echo "⭐️ 코드 테스트"
+              pip install pytest
+              pytest
 
               echo "⭐️ 설정 완료"
               touch /home/${{ secrets.SSH_USERNAME }}/.setup_done
@@ -122,5 +129,11 @@ jobs:
             cd $CURRENT_DIR/${{ vars.repository_name }}
             echo "현재 위치: $(pwd)"
             git pull origin main
-            echo "⭐️ 배포 완료"
-            # 추가적인 배포 명령어들
+
+            # docker-compose.yaml이나 DAG 파일 변경이 감지되면 Airflow 재시작
+            if git diff --name-only HEAD~1 | grep -E 'docker-compose.yaml|dags/'; then
+              echo "⭐️ Airflow 재시작"
+              astro dev stop
+              astro dev start
+            fi
+            echo "⭐️ 배포 완료"            
