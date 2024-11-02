@@ -125,6 +125,10 @@ jobs:
             echo "현재 위치: $(pwd)"
             git pull origin main
 
+            echo "⭐️ 코드 테스트 실행"
+            conda activate airflow-prac
+            pytest || echo "❌ 테스트 실패"
+
             echo "⭐️ PostgreSQL에서 사용자와 데이터베이스 생성"
             sudo -u postgres psql -c "DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'ryu') THEN CREATE ROLE ryu WITH LOGIN CREATEDB; END IF; END $$;"
             sudo -u postgres psql -c "SELECT 'CREATE DATABASE ryu' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'ryu')\gexec"
