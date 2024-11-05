@@ -69,7 +69,7 @@ services:
       - /home/ryu/airflow-practice/tests:/usr/local/airflow/tests:z
 
       - /home/ryu/airflow-practice/airflow_settings.yaml:/usr/local/airflow/airflow_settings.yaml:z
-
+      - /home/ryu/airflow-practice/data/logs:/usr/local/airflow/data/logs:z # 03-python-operator에서 사용
       
       - airflow_logs:/usr/local/airflow/logs
       
