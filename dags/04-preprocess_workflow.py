@@ -20,7 +20,7 @@ with DAG(
         
         # pandas로 데이터 불러오기
         df = pd.read_csv(
-            filepath_or_buffer="data/logs/log-241001.txt", 
+            filepath_or_buffer="data/logs/log1.txt", 
             delimiter=" "
         )
         logger.info(f"df: \n{df}\n\n")

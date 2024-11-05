@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "airflow-practice"
+version = "0.1.0"
+description = ""
+authors = ["kpryu6 <kyongpyo0626@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pandas = "^2.2.3"
+python-dotenv = "^1.0.1"
+sqlalchemy = "1.4.52"
+psycopg2-binary = "^2.9.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
